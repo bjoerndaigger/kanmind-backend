@@ -37,7 +37,7 @@ class CustomUserAdmin(UserAdmin):
         """
         return obj.first_name
     # Provide a readable label for the admin column
-    get_fullname.short_description = 'Fullname'
+    get_fullname.short_description = 'Full Name'
 
 
 # Unregister the default User admin and register the custom one
