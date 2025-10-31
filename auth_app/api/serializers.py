@@ -53,11 +53,11 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
         if password != repeated_password:
             raise serializers.ValidationError(
-                {'Error': "Passwords don't match"})
+                {'Error': "Passwords don't match."})
 
         if User.objects.filter(email=email).exists():
             raise serializers.ValidationError(
-                {'Error': 'User with this email already exists'})
+                {'Error': 'User with this email already exists.'})
 
         account = User(
             email=email,
@@ -68,3 +68,51 @@ class RegistrationSerializer(serializers.ModelSerializer):
         account.set_password(password)
         account.save()
         return account
+
+
+class CustomLoginEmailOnlySerializer(serializers.Serializer):
+    """
+    Serializer for user login using email and password.
+
+    This serializer validates the login credentials and ensures that:
+        1. The user with the given email exists.
+        2. The provided password matches the user's password.
+
+    Upon successful validation, it adds the authenticated User instance
+    to the validated data for further use (e.g., generating a token).
+    
+    Attributes:
+        email (EmailField): The email address of the user.
+        password (CharField): The user's password. Write-only for security.
+    """
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        """
+        Validate the user's email and password.
+
+        Args:
+            data (dict): Dictionary containing 'email' and 'password' from the request.
+
+        Raises:
+            serializers.ValidationError: If the user does not exist or the password is incorrect.
+
+        Returns:
+            dict: The validated data including the authenticated 'user' instance.
+        """
+        email = data.get('email')
+        password = data.get('password')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError(
+                {'Error': "User doesn't exist."})
+
+        if not user.check_password(password):
+            raise serializers.ValidationError(
+                {'Error': 'Wrong password'})
+
+        data['user'] = user
+        return data
