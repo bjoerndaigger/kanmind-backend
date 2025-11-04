@@ -13,3 +13,7 @@ class BoardViewSet(viewsets.ModelViewSet):
 
     queryset = Board.objects.all()
     serializer_class = BoardSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
