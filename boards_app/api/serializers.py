@@ -33,3 +33,7 @@ class BoardSerializer(serializers.ModelSerializer):
 
     def get_tasks_high_prio_count(self, obj):
         return None
+
+
+class BoardDetailSerializer(serializers.ModelSerializer):
+    pass
