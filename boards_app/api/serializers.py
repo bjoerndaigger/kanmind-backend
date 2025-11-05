@@ -11,7 +11,15 @@ class BoardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Board
-        fields = ['id', 'title', 'member_count', 'ticket_count', 'tasks_to_do_count', 'tasks_high_prio_count', 'owner_id']
+        fields = ['id', 'title', 'members', 'member_count', 'ticket_count',
+                  'tasks_to_do_count', 'tasks_high_prio_count', 'owner_id']
+        extra_kwargs = {'members': {'write_only': True}}
+
+    def create(self, validated_data):
+        members_data = validated_data.pop('members')
+        board_instance = Board.objects.create(**validated_data)
+        board_instance.members.set(members_data)
+        return board_instance
 
     def get_member_count(self, obj):
         return obj.members.count()
