@@ -1,7 +1,7 @@
 from django.urls import path
 
-from .views import BoardViewSet
+from .views import BoardListCreateView
 
 urlpatterns = [
-    path('boards/', BoardViewSet.as_view(), name='boards')
+    path('boards/', BoardListCreateView.as_view(), name='boards') # GET / POST
 ]
