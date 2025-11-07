@@ -36,4 +36,6 @@ class BoardSerializer(serializers.ModelSerializer):
 
 
 class BoardDetailSerializer(serializers.ModelSerializer):
-    pass
+    class Meta:
+        model = Board
+        fields = '__all__'

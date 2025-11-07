@@ -4,7 +4,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from boards_app.models import Board
-from .serializers import BoardSerializer
+from .serializers import BoardSerializer, BoardDetailSerializer
 
 
 class BoardListCreateView(generics.ListCreateAPIView):
@@ -22,3 +22,10 @@ class BoardListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = Board.objects.all()
+    serializer_class = BoardDetailSerializer
