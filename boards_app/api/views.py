@@ -4,6 +4,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from boards_app.models import Board
+from .permissions import IsOwnerOrMember
 from .serializers import BoardSerializer, BoardDetailSerializer
 
 
@@ -18,7 +19,7 @@ class BoardListCreateView(generics.ListCreateAPIView):
         if user.is_superuser:
             return Board.objects.all()
 
-        return Board.objects.filter(Q(owner=user) | Q(members=user))
+        return Board.objects.filter(Q(owner=user) | Q(members=user)).distinct()
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
@@ -26,6 +27,6 @@ class BoardListCreateView(generics.ListCreateAPIView):
 
 class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrMember]
     queryset = Board.objects.all()
     serializer_class = BoardDetailSerializer
