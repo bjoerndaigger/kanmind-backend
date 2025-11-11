@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from boards_app.models import Board
@@ -35,7 +36,20 @@ class BoardSerializer(serializers.ModelSerializer):
         return None
 
 
+class BoardMemberSerializer(serializers.ModelSerializer):
+    fullname = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'email', 'fullname']
+
+    def get_fullname(self, obj):
+        return obj.first_name
+
+
 class BoardDetailSerializer(serializers.ModelSerializer):
+    members = BoardMemberSerializer(many=True, read_only=True)
+
     class Meta:
         model = Board
-        fields = '__all__'
+        fields = ['id', 'title', 'owner_id', 'members']
