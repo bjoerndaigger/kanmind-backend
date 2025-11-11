@@ -1,11 +1,13 @@
+from django.contrib.auth.models import User
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.decorators import api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .serializers import RegistrationSerializer, CustomLoginEmailOnlySerializer
+from .serializers import CustomLoginEmailOnlySerializer, RegistrationSerializer
 
 
 class RegistrationAPIView(APIView):
@@ -108,3 +110,41 @@ class CustomLoginView(ObtainAuthToken):
             return Response(data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view()
+def email_check_view(request):
+    """
+    API endpoint to check the existence and validity of an email address.
+
+    Query Parameters:
+    - email (str): The email address to be checked.
+
+    Responses:
+    - 200 OK: Returns user details if the email exists.
+        {
+            "id": int,
+            "email": str,
+            "fullname": str
+        }
+    - 400 Bad Request: Returned if the email parameter is missing or has an invalid format.
+        {"Error": "Email missing"} or {"Error": "Invalid email format"}
+    - 404 Not Found: Returned if no user exists with the provided email.
+        {"Error": "Email not found"}
+    """
+    email = request.query_params.get('email')
+    
+    if not email:
+        return Response({"Error": "Email missing"}, status=status.HTTP_400_BAD_REQUEST)
+    if '@' not in email or '.' not in email:
+        return Response({"Error": "Invalid email format"}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        user = User.objects.get(email=email)
+        return Response({
+            "id": user.id,
+            "email": user.email,
+            "fullname": user.first_name
+        })
+    except User.DoesNotExist:
+        return Response({"Error": "Email not found"}, status=status.HTTP_404_NOT_FOUND)
