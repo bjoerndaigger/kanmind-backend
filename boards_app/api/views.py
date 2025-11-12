@@ -5,7 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 
 from boards_app.models import Board
 from .permissions import IsOwnerOrMember
-from .serializers import BoardSerializer, BoardDetailSerializer
+from .serializers import BoardSerializer, BoardDetailReadSerializer, BoardDetailWriteSerializer
 
 
 class BoardListCreateView(generics.ListCreateAPIView):
@@ -29,4 +29,9 @@ class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerOrMember]
     queryset = Board.objects.all()
-    serializer_class = BoardDetailSerializer
+
+    def get_serializer_class(self):
+        if self.request.method in ['PATCH', 'PUT']:
+            return BoardDetailWriteSerializer
+
+        return BoardDetailReadSerializer

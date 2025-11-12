@@ -47,8 +47,17 @@ class BoardMemberSerializer(serializers.ModelSerializer):
         return obj.first_name
 
 
-class BoardDetailSerializer(serializers.ModelSerializer):
-    members = BoardMemberSerializer(many=True, read_only=True)
+class BoardDetailReadSerializer(serializers.ModelSerializer):
+    members = BoardMemberSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = Board
+        fields = ['id', 'title', 'owner_id', 'members']
+
+
+class BoardDetailWriteSerializer(serializers.ModelSerializer):
+    members = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), many=True)
 
     class Meta:
         model = Board
