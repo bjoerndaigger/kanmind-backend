@@ -10,7 +10,7 @@ from .serializers import BoardSerializer, BoardDetailReadSerializer, BoardDetail
 
 class BoardListCreateView(generics.ListCreateAPIView):
     authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwnerOrMember]
     serializer_class = BoardSerializer
 
     def get_queryset(self):
