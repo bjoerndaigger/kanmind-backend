@@ -12,8 +12,14 @@ class BoardSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Board
-        fields = ['id', 'title', 'members', 'member_count', 'ticket_count',
-                  'tasks_to_do_count', 'tasks_high_prio_count', 'owner_id']
+        fields = ['id',
+                  'title',
+                  'members',
+                  'member_count',
+                  'ticket_count',
+                  'tasks_to_do_count',
+                  'tasks_high_prio_count',
+                  'owner_id']
         extra_kwargs = {'members': {'write_only': True}}
 
     def create(self, validated_data):
@@ -56,8 +62,10 @@ class BoardDetailReadSerializer(serializers.ModelSerializer):
 
 
 class BoardDetailWriteSerializer(serializers.ModelSerializer):
-    members = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True, write_only=True)
-    members_data = BoardMemberSerializer(read_only=True, many=True, source='members')
+    members = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), many=True, write_only=True)
+    members_data = BoardMemberSerializer(
+        read_only=True, many=True, source='members')
     owner_data = BoardMemberSerializer(read_only=True, source='owner')
 
     class Meta:
