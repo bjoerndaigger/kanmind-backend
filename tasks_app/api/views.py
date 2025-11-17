@@ -3,7 +3,7 @@ from rest_framework import generics
 
 from tasks_app.models import Task
 from .permissions import IsBoardMember
-from .serializers import TaskSerializer, AssignedTaskSerializer
+from .serializers import TaskSerializer, TaskReadSerializer
 
 
 class TasksCreateView(generics.CreateAPIView):
@@ -12,10 +12,19 @@ class TasksCreateView(generics.CreateAPIView):
     permission_classes = [IsBoardMember]
 
 
-class AssignedToMeTaskListView(generics.ListAPIView):
-    serializer_class = AssignedTaskSerializer
+class AssignedTasksListView(generics.ListAPIView):
+    serializer_class = TaskReadSerializer
 
     def get_queryset(self):
         user = self.request.user
 
-        return Task.objects.filter(Q(assignee=user) | Q(reviewer=user)).distinct()
+        return Task.objects.filter(assignee=user)
+
+
+class ReviewingTasksListView(generics.ListAPIView):
+    serializer_class = TaskReadSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+
+        return Task.objects.filter(reviewer=user)
