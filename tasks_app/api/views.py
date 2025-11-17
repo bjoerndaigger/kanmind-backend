@@ -1,5 +1,5 @@
 from django.db.models import Q
-from rest_framework import generics
+from rest_framework import generics, mixins
 
 from tasks_app.models import Task
 from .permissions import IsBoardMember
@@ -28,3 +28,12 @@ class ReviewingTasksListView(generics.ListAPIView):
         user = self.request.user
 
         return Task.objects.filter(reviewer=user)
+
+
+class TaskUpdateDeleteView(generics.UpdateAPIView, mixins.DestroyModelMixin):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [IsBoardMember]
+
+    def delete(self, request, *args, **kwargs):
+        return self.destroy(request, *args, **kwargs)
