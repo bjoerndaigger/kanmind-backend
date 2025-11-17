@@ -34,3 +34,24 @@ class TaskSerializer(serializers.ModelSerializer):
     def get_comments_count(self, obj):
         # Placeholder, data not yet available
         return 0
+
+class AssignedTaskSerializer(serializers.ModelSerializer):
+    assignee = BoardMemberSerializer(read_only=True)
+    reviewer = BoardMemberSerializer(read_only=True)
+    comments_count = serializers.SerializerMethodField()
+    class Meta:
+        model = Task
+        fields = ['id',
+                  'board',
+                  'title',
+                  'description',
+                  'status',
+                  'priority',
+                  'assignee', 
+                  'reviewer', 
+                  'due_date',
+                  'comments_count']
+        
+    def get_comments_count(self, obj):
+        # Placeholder, data not yet available
+        return 0

@@ -4,5 +4,5 @@ from .views import BoardListCreateView, BoardDetailView
 
 urlpatterns = [
     path('', BoardListCreateView.as_view(), name='boards'), # GET / POST
-    path('<int:pk>/', BoardDetailView.as_view(), name='boards-detail') # GET / PATCH / DELETE
+    path('<int:pk>/', BoardDetailView.as_view(), name='boards_detail') # GET / PATCH / DELETE
 ]
