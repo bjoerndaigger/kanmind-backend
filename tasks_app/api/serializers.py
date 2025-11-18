@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from boards_app.api.serializers import BoardMemberSerializer
-from tasks_app.models import Task
+from tasks_app.models import Task, Comments
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -63,3 +63,13 @@ class TaskReadSerializer(serializers.ModelSerializer):
     def get_comments_count(self, obj):
         # Placeholder, data not yet available
         return 0
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)
+    created_at = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True)
+
+    class Meta:
+        model = Comments
+        fields = ['id', 'created_at', 'author', 'content']
+      
