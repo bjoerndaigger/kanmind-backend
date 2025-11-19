@@ -2,7 +2,7 @@ from django.db.models import Q
 from rest_framework import generics, mixins
 
 from tasks_app.models import Task, Comments
-from .permissions import IsBoardMember
+from .permissions import IsBoardMember, IsAuthor
 from .serializers import TaskSerializer, TaskReadSerializer, CommentSerializer
 
 
@@ -44,10 +44,16 @@ class CommentsListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsBoardMember]
 
     def get_queryset(self):
-        task_id = self.kwargs.get('pk')
+        task_id = self.kwargs.get('task_id')
         return Comments.objects.filter(task_id=task_id).order_by('created_at')
 
     def perform_create(self, serializer):
         user = self.request.user
-        task_id = self.kwargs.get('pk')
+        task_id = self.kwargs.get('task_id')
         serializer.save(author=user, task_id=task_id)
+
+
+class CommentsDeleteView(generics.DestroyAPIView):
+    queryset = Comments.objects.all()
+    serializer_class = CommentSerializer
+    permission_classes=[IsAuthor]
