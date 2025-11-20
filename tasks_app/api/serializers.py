@@ -29,17 +29,19 @@ class TaskSerializer(serializers.ModelSerializer):
                   'assignee', 'assignee_id',
                   'reviewer', 'reviewer_id',
                   'due_date',
-                  'comments_count']
+                  'comments_count'
+                  ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         request = self.context.get('request', None)
+
         if request and request.method == 'PATCH':
             self.fields.pop('board', None)
+            self.fields.pop('comments_count', None)
 
     def get_comments_count(self, obj):
-        # Placeholder, data not yet available
-        return 0
+        return Comments.objects.filter(task=obj).count()
 
 
 class TaskReadSerializer(serializers.ModelSerializer):
@@ -61,8 +63,7 @@ class TaskReadSerializer(serializers.ModelSerializer):
                   'comments_count']
 
     def get_comments_count(self, obj):
-        # Placeholder, data not yet available
-        return 0
+        return Comments.objects.filter(task=obj).count()
 
 
 class CommentSerializer(serializers.ModelSerializer):
