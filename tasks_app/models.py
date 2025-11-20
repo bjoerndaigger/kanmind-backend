@@ -20,22 +20,22 @@ PRIORITY_CHOICES = [
 
 
 class Task(models.Model):
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name='tasks')
     title = models.CharField(max_length=255)
     description = models.TextField()
     status = models.CharField(max_length=11, choices=STATUS_CHOICES)
     priority = models.CharField(max_length=6, choices=PRIORITY_CHOICES)
     assignee = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="assigned_tasks", null=True, blank=True)
+        User, on_delete=models.CASCADE, related_name='assigned_tasks', null=True, blank=True)
     reviewer = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="reviewed_tasks", null=True, blank=True)
+        User, on_delete=models.CASCADE, related_name='reviewed_tasks', null=True, blank=True)
     due_date = models.DateField(null=True, blank=True)
 
 
 class Comments(models.Model):
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="author_comments")
+        User, on_delete=models.CASCADE, related_name='author_comments')
     task = models.ForeignKey(
-        Task, on_delete=models.CASCADE, related_name="task_comments")
+        Task, on_delete=models.CASCADE, related_name='task_comments')
     content = models.CharField(max_length=255)
     created_at = models.DateTimeField(auto_now_add=True)

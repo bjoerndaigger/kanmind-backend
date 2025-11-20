@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from boards_app.models import Board
+from tasks_app.models import Comments, Task
 
 
 class BoardSerializer(serializers.ModelSerializer):
@@ -31,15 +32,14 @@ class BoardSerializer(serializers.ModelSerializer):
     def get_member_count(self, obj):
         return obj.members.count()
 
-    # Placeholder, data not yet available
     def get_ticket_count(self, obj):
-        return None
+        return obj.tasks.count()
 
     def get_tasks_to_do_count(self, obj):
-        return None
+        return obj.tasks.filter(status='to-do').count()
 
     def get_tasks_high_prio_count(self, obj):
-        return None
+        return obj.tasks.filter(status='high').count()
 
 
 class BoardMemberSerializer(serializers.ModelSerializer):
@@ -53,12 +53,38 @@ class BoardMemberSerializer(serializers.ModelSerializer):
         return obj.first_name
 
 
+class TaskInBoardSerializer(serializers.ModelSerializer):
+    assignee = BoardMemberSerializer(read_only=True)
+    reviewer = BoardMemberSerializer(read_only=True)
+    comments_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Task
+        fields = ['id',
+                  'title',
+                  'description',
+                  'status',
+                  'priority',
+                  'assignee',
+                  'reviewer',
+                  'due_date',
+                  'comments_count']
+
+    def get_comments_count(self, obj):
+        return Comments.objects.filter(task=obj).count()
+
+
 class BoardDetailReadSerializer(serializers.ModelSerializer):
     members = BoardMemberSerializer(read_only=True, many=True)
+    tasks = TaskInBoardSerializer(read_only=True, many=True)
 
     class Meta:
         model = Board
-        fields = ['id', 'title', 'owner_id', 'members']
+        fields = ['id', 'title', 'owner_id',
+                  'members', 'tasks']
+
+    def get_comments_count(self, obj):
+        return Comments.objects.filter(task__board=obj).count()
 
 
 class BoardDetailWriteSerializer(serializers.ModelSerializer):
