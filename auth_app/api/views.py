@@ -48,7 +48,7 @@ class RegistrationAPIView(APIView):
 
             data = {
                 'token': token.key,
-                'fullname': saved_account.username,
+                'fullname': saved_account.first_name,
                 'email': saved_account.email,
                 'user_id': saved_account.pk
             }
@@ -103,7 +103,7 @@ class CustomLoginView(ObtainAuthToken):
 
             data = {
                 'token': token.key,
-                'fullname': user.username,
+                'fullname': user.first_name,
                 'email': user.email,
                 'user_id': user.pk
             }
