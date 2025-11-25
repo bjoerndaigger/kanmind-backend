@@ -1,4 +1,5 @@
 from rest_framework.permissions import BasePermission
+from rest_framework.exceptions import NotFound
 
 from boards_app.models import Board
 from tasks_app.models import Task
@@ -20,6 +21,7 @@ class IsBoardMember(BasePermission):
       validated through the task’s board as fallback.
     - For updating or deleting a Task, the permission checks the board linked to the Task instance.
     - Returns True if the user is a member of the board, False otherwise.
+    - Raises NotFound (404) if the board or task does not exist.
     """
 
     def has_permission(self, request, view):
@@ -43,7 +45,7 @@ class IsBoardMember(BasePermission):
                     board = Board.objects.get(pk=board_id)
                     return board.members.filter(pk=request.user.pk).exists()
                 except Board.DoesNotExist:
-                    return False
+                    raise NotFound(detail="Board not found.")
 
             task_pk = view.kwargs.get('task_id')
             if task_pk:
@@ -51,7 +53,7 @@ class IsBoardMember(BasePermission):
                     task = Task.objects.get(pk=task_pk)
                     return task.board.members.filter(pk=request.user.pk).exists()
                 except Task.DoesNotExist:
-                    return False
+                    raise NotFound(detail="Task not found.")
 
             return False
         return True
