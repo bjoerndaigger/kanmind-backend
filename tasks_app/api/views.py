@@ -2,7 +2,7 @@ from django.db.models import Q
 from rest_framework import generics, mixins
 
 from tasks_app.models import Task, Comments
-from .permissions import IsBoardMember, IsAuthor
+from .permissions import IsBoardMember, IsAuthor, IsTaskOwnerBoardMember
 from .serializers import TaskSerializer, TaskReadSerializer, CommentSerializer
 
 
@@ -33,7 +33,7 @@ class ReviewingTasksListView(generics.ListAPIView):
 class TaskUpdateDeleteView(generics.UpdateAPIView, mixins.DestroyModelMixin):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    permission_classes = [IsBoardMember]
+    permission_classes = [IsTaskOwnerBoardMember]
 
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
@@ -41,7 +41,7 @@ class TaskUpdateDeleteView(generics.UpdateAPIView, mixins.DestroyModelMixin):
 
 class CommentsListCreateView(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsBoardMember]
+    permission_classes = [IsTaskOwnerBoardMember]
 
     def get_queryset(self):
         task_id = self.kwargs.get('task_id')
