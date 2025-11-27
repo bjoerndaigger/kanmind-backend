@@ -51,6 +51,5 @@ class IsAuthor(BasePermission):
     is the author of that object. This is used to restrict delete operations to 
     the author.
     """
-
     def has_object_permission(self, request, view, obj):
         return obj.author == request.user
