@@ -22,6 +22,24 @@ source .venv/bin/activate      # On Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 ```
 
+### Create environment file
+
+```bash
+cp .env.template .env
+```
+
+Generate a secret key:
+
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+Open the `.env` file and add your generated secret key:
+
+```
+SECRET_KEY='your-secret-key-here'
+```
+
 ### Run migrations
 
 ```bash
