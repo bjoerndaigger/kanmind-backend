@@ -9,6 +9,12 @@ from .serializers import BoardSerializer, BoardDetailReadSerializer, BoardDetail
 
 
 class BoardListCreateView(generics.ListCreateAPIView):
+    """
+    List all boards the user can access or create a new board.
+    
+    - Superusers see all boards.
+    - Regular users see boards where they are owner or member.
+    """
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerOrMember]
     serializer_class = BoardSerializer
@@ -19,13 +25,21 @@ class BoardListCreateView(generics.ListCreateAPIView):
         if user.is_superuser:
             return Board.objects.all()
 
+        # Return boards where the user is owner or member
         return Board.objects.filter(Q(owner=user) | Q(members=user)).distinct()
 
     def perform_create(self, serializer):
+        # Assign the requesting user as the owner of the new board
         serializer.save(owner=self.request.user)
 
 
 class BoardDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Retrieve, update, or delete a board.
+
+    - PATCH/PUT requests use BoardDetailWriteSerializer for editing members.
+    - GET requests use BoardDetailReadSerializer for nested read-only details.
+    """
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated, IsOwnerOrMember]
     queryset = Board.objects.all()

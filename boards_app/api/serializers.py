@@ -6,6 +6,11 @@ from tasks_app.models import Comments, Task
 
 
 class BoardSerializer(serializers.ModelSerializer):
+    """
+    Serializer for listing or creating boards.
+
+    Adds counts for members and tasks, including filtered task counts.
+    """
     member_count = serializers.SerializerMethodField()
     ticket_count = serializers.SerializerMethodField()
     tasks_to_do_count = serializers.SerializerMethodField()
@@ -24,6 +29,7 @@ class BoardSerializer(serializers.ModelSerializer):
         extra_kwargs = {'members': {'write_only': True}}
 
     def create(self, validated_data):
+        # Assign members after board creation
         members_data = validated_data.pop('members')
         board_instance = Board.objects.create(**validated_data)
         board_instance.members.set(members_data)
@@ -43,6 +49,10 @@ class BoardSerializer(serializers.ModelSerializer):
 
 
 class BoardMemberSerializer(serializers.ModelSerializer):
+    """
+    Serializer for board members.
+    Provides basic user info and computed full name.
+    """
     fullname = serializers.SerializerMethodField()
 
     class Meta:
@@ -54,6 +64,10 @@ class BoardMemberSerializer(serializers.ModelSerializer):
 
 
 class TaskInBoardSerializer(serializers.ModelSerializer):
+    """
+    Serializer for tasks within a board.
+    Includes nested assignee and reviewer info and comments count.
+    """
     assignee = BoardMemberSerializer(read_only=True)
     reviewer = BoardMemberSerializer(read_only=True)
     comments_count = serializers.SerializerMethodField()
@@ -75,6 +89,9 @@ class TaskInBoardSerializer(serializers.ModelSerializer):
 
 
 class BoardDetailReadSerializer(serializers.ModelSerializer):
+    """
+    Detailed serializer for reading a board with nested members and tasks.
+    """
     members = BoardMemberSerializer(read_only=True, many=True)
     tasks = TaskInBoardSerializer(read_only=True, many=True)
 
@@ -88,10 +105,12 @@ class BoardDetailReadSerializer(serializers.ModelSerializer):
 
 
 class BoardDetailWriteSerializer(serializers.ModelSerializer):
-    members = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), many=True, write_only=True)
-    members_data = BoardMemberSerializer(
-        read_only=True, many=True, source='members')
+    """
+    Serializer for updating a board's members.
+    Provides read-only nested member info and owner info.
+    """
+    members = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), many=True, write_only=True)
+    members_data = BoardMemberSerializer(read_only=True, many=True, source='members')
     owner_data = BoardMemberSerializer(read_only=True, source='owner')
 
     class Meta:

@@ -1,5 +1,4 @@
 from django.contrib.auth.models import User
-
 from rest_framework import serializers
 
 from boards_app.api.serializers import BoardMemberSerializer
@@ -7,12 +6,17 @@ from tasks_app.models import Task, Comments
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    assignee_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), write_only=True, source='assignee')
+    """
+    Serializer for creating or updating tasks.
+
+    - Handles nested assignee and reviewer info.
+    - Supports comments count.
+    - Dynamically removes 'board' and 'comments_count' fields for PATCH requests.
+    """
+    assignee_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True, source='assignee')
     assignee = BoardMemberSerializer(read_only=True)
 
-    reviewer_id = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(), write_only=True, source='reviewer')
+    reviewer_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), write_only=True, source='reviewer')
     reviewer = BoardMemberSerializer(read_only=True)
 
     comments_count = serializers.SerializerMethodField()
@@ -36,6 +40,7 @@ class TaskSerializer(serializers.ModelSerializer):
         super().__init__(*args, **kwargs)
         request = self.context.get('request', None)
 
+        # For PATCH requests, make 'board' and 'comments_count' read-only
         if request and request.method == 'PATCH':
             self.fields.pop('board', None)
             self.fields.pop('comments_count', None)
@@ -45,6 +50,9 @@ class TaskSerializer(serializers.ModelSerializer):
 
 
 class TaskReadSerializer(serializers.ModelSerializer):
+    """
+    Serializer for reading tasks with nested assignee/reviewer and comments count.
+    """
     assignee = BoardMemberSerializer(read_only=True)
     reviewer = BoardMemberSerializer(read_only=True)
     comments_count = serializers.SerializerMethodField()
@@ -67,6 +75,12 @@ class TaskReadSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for comments.
+
+    - Read-only author name.
+    - Formatted read-only creation date.
+    """
     author = serializers.ReadOnlyField(source='author.first_name')
     created_at = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True)
 

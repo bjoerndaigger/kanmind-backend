@@ -12,31 +12,11 @@ from .serializers import CustomLoginEmailOnlySerializer, RegistrationSerializer
 
 class RegistrationAPIView(APIView):
     """
-    API view for user registration.
-
-    This view allows unauthenticated users to register by sending
-    a POST request with required user details. Upon successful 
-    registration, an authentication token is created and returned
-    along with the user details.
-
-    Attributes:
-        permission_classes (list): Permissions for the view (AllowAny to allow public access).
+    Register a new user and return an authentication token.
     """
-
     permission_classes = [AllowAny]
 
     def post(self, request):
-        """
-        Handle POST request for user registration.
-
-        Args:
-            request (Request): The HTTP request object containing registration data.
-
-        Returns:
-            Response: A REST framework Response containing either:
-                - Success: User data and authentication token (status 201)
-                - Failure: Validation errors (status 201, same as DRF default for errors)
-        """
         serializer = RegistrationSerializer(data=request.data)
 
         data = {}
@@ -60,39 +40,11 @@ class RegistrationAPIView(APIView):
 
 class CustomLoginView(ObtainAuthToken):
     """
-    Custom login view using email and password for authentication.
-
-    This view allows users to log in using their email instead of
-    the default username. Upon successful authentication, it returns
-    an authentication token and basic user information.
-
-    Attributes:
-        permission_classes (list): AllowAny permits both authenticated
-                                   and unauthenticated users to access this view.
+    Authenticate a user using email and password, returning a token.
     """
     permission_classes = [AllowAny]
 
     def post(self, request):
-        """
-        Handle POST requests for user login via email.
-
-        Steps:
-            1. Initialize the serializer with request data.
-            2. Validate the serializer.
-            3. If valid:
-                a. Retrieve the authenticated user.
-                b. Get or create an authentication token.
-                c. Return user details and token.
-            4. If invalid, return validation errors.
-
-        Args:
-            request (Request): The HTTP request containing 'email' and 'password'.
-
-        Returns:
-            Response: A REST framework Response containing either:
-                - Success: token, fullname, email, and user_id (status 200)
-                - Failure: validation errors (status 400)
-        """
         serializer = CustomLoginEmailOnlySerializer(data=request.data)
 
         data = {}
@@ -115,22 +67,8 @@ class CustomLoginView(ObtainAuthToken):
 @api_view()
 def email_check_view(request):
     """
-    API endpoint to check the existence and validity of an email address.
-
-    Query Parameters:
-    - email (str): The email address to be checked.
-
-    Responses:
-    - 200 OK: Returns user details if the email exists.
-        {
-            "id": int,
-            "email": str,
-            "fullname": str
-        }
-    - 400 Bad Request: Returned if the email parameter is missing or has an invalid format.
-        {"Error": "Email missing"} or {"Error": "Invalid email format"}
-    - 404 Not Found: Returned if no user exists with the provided email.
-        {"Error": "Email not found"}
+    Check if a user exists with the provided email.
+    Returns user details if found.
     """
     email = request.query_params.get('email')
     

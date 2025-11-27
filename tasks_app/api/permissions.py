@@ -1,17 +1,22 @@
-from rest_framework.permissions import BasePermission
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import BasePermission
 
 from boards_app.models import Board
 from tasks_app.models import Task
 
 
 class IsBoardMember(BasePermission):
+    """
+    Grants permission for POST requests only if the user is a member
+    of the board specified in the request data.
+    """
     def has_permission(self, request, view):
         if request.method == 'POST':
             board_id = request.data.get('board')
             if not board_id:
-                return True 
-                
+                # No board specified, allow by default
+                # Validation is handled by the TaskSerializer
+                return True
             try:
                 board = Board.objects.get(pk=board_id)
                 return board.members.filter(pk=request.user.pk).exists()
@@ -21,6 +26,10 @@ class IsBoardMember(BasePermission):
 
 
 class IsTaskOwnerBoardMember(BasePermission):
+    """
+    Grants permission if the user is a member of the board associated
+    with the task. Used for task-level access control.
+    """
     def has_permission(self, request, view):
         task_pk = view.kwargs.get('task_id')
         if task_pk:
@@ -29,10 +38,12 @@ class IsTaskOwnerBoardMember(BasePermission):
                 return task.board.members.filter(pk=request.user.pk).exists()
             except Task.DoesNotExist:
                 raise NotFound(detail="Task not found.")
-        return True 
+        return True
 
     def has_object_permission(self, request, view, obj):
+        # Object-level check: user must be a member of the task's board
         return obj.board.members.filter(pk=request.user.pk).exists()
+
 
 class IsAuthor(BasePermission):
     """
@@ -40,5 +51,6 @@ class IsAuthor(BasePermission):
     is the author of that object. This is used to restrict delete operations to 
     the author.
     """
+
     def has_object_permission(self, request, view, obj):
         return obj.author == request.user

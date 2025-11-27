@@ -5,12 +5,10 @@ from django.contrib.auth.admin import UserAdmin
 
 class CustomUserAdmin(UserAdmin):
     """
-    Custom Django admin configuration for the User model.
+    Custom admin for User model.
 
-    This class customizes the User admin interface by:
-        - Organizing fields into meaningful sections (fieldsets)
-        - Displaying the user's full name and email in the user list
-        - Providing a custom method to display the full name
+    - Displays first name as 'Full Name' in the list view.
+    - Uses default fieldsets with minimal customization.
     """
 
     # Fieldsets define sections in the user edit page
@@ -26,17 +24,8 @@ class CustomUserAdmin(UserAdmin):
     list_display = ('get_fullname', 'email', 'is_staff')
 
     def get_fullname(self, obj):
-        """
-        Custom method to display the user's full name in the admin list view.
-
-        Args:
-            obj (User): User instance
-
-        Returns:
-            str: First name of the user
-        """
+        # Display first name as Full Name in the admin list view
         return obj.first_name
-    # Provide a readable label for the admin column
     get_fullname.short_description = 'Full Name'
 
 
