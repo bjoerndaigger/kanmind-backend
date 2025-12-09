@@ -38,7 +38,7 @@ class Task(models.Model):
     due_date = models.DateField()
 
 
-class Comments(models.Model):
+class Comment(models.Model):
     """
     Represents a comment on a task.
 

@@ -2,7 +2,7 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from boards_app.api.serializers import BoardMemberSerializer
-from tasks_app.models import Task, Comments
+from tasks_app.models import Task, Comment
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -46,7 +46,7 @@ class TaskSerializer(serializers.ModelSerializer):
             self.fields.pop('comments_count', None)
 
     def get_comments_count(self, obj):
-        return Comments.objects.filter(task=obj).count()
+        return Comment.objects.filter(task=obj).count()
 
 
 class TaskReadSerializer(serializers.ModelSerializer):
@@ -71,7 +71,7 @@ class TaskReadSerializer(serializers.ModelSerializer):
                   'comments_count']
 
     def get_comments_count(self, obj):
-        return Comments.objects.filter(task=obj).count()
+        return Comment.objects.filter(task=obj).count()
 
 
 class CommentSerializer(serializers.ModelSerializer):
@@ -85,6 +85,6 @@ class CommentSerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%SZ", read_only=True)
 
     class Meta:
-        model = Comments
+        model = Comment
         fields = ['id', 'created_at', 'author', 'content']
       
