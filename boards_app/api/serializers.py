@@ -26,13 +26,15 @@ class BoardSerializer(serializers.ModelSerializer):
                   'tasks_to_do_count',
                   'tasks_high_prio_count',
                   'owner_id']
-        extra_kwargs = {'members': {'write_only': True}}
+        extra_kwargs = {'members': {'write_only': True, 'required': False}}
 
     def create(self, validated_data):
-        # Assign members after board creation
-        members_data = validated_data.pop('members')
+        # Assign members after board creation and always include owner.
+        members_data = validated_data.pop('members', [])
         board_instance = Board.objects.create(**validated_data)
         board_instance.members.set(members_data)
+        if board_instance.owner_id:
+            board_instance.members.add(board_instance.owner)
         return board_instance
 
     def get_member_count(self, obj):
