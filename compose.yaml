@@ -1,0 +1,22 @@
+version: '3.9'
+
+services:
+  django-app:
+    # Build image from local Dockerfile
+    build: .
+    # Map host port 8000 to container port 8000
+    ports:
+      - 8000:8000
+    # Load sensitive variables from .env file
+    env_file:
+      - .env
+    # Non-sensitive environment variables
+    environment:
+      - APPLICATION_PORT=8000
+    # Persist data beyond container lifecycle
+    volumes:
+      - local_data:/app/
+
+# Named volume managed by Docker
+volumes:
+  local_data:
