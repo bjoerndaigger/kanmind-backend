@@ -11,8 +11,9 @@ COPY . $WORKDIR
 ENV APPLICATION_PORT=8000 
 
 # Install dependencies and make entrypoint executable
-RUN pip install -r requirements.txt \ 
-    && chmod +x /app/entrypoint.sh      
+RUN apk add --no-cache postgresql-dev gcc musl-dev \
+    && pip install -r requirements.txt \
+    && chmod +x /app/entrypoint.sh   
 
 # Document the port (informational only)
 EXPOSE ${APPLICATION_PORT}

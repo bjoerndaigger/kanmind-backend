@@ -3,5 +3,6 @@ Django==5.2.7
 django-cors-headers==4.9.0
 django-dotenv==1.4.2
 djangorestframework==3.16.1
+psycopg2-binary  # Enables Django to communicate with a PostgreSQL database
 python-dotenv==1.2.1
 sqlparse==0.5.3
