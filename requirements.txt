@@ -7,3 +7,4 @@ gunicorn
 psycopg2-binary  # Enables Django to communicate with a PostgreSQL database
 python-dotenv==1.2.1
 sqlparse==0.5.3
+whitenoise

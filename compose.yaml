@@ -18,6 +18,10 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # Mirrors local code into container for live reload
+    # Remove in production
+    volumes:
+      - .:/app/
 
   # DB configuration
   db:
