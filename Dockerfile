@@ -18,5 +18,9 @@ RUN apk add --no-cache postgresql-dev gcc musl-dev \
 # Document the port (informational only)
 EXPOSE ${APPLICATION_PORT}
 
+# Create and switch to non-root user for security
+RUN adduser -D appuser
+USER appuser
+
 # Run entrypoint script on container start
-ENTRYPOINT ["/bin/sh", "-c", "/app/entrypoint.sh"]
+ENTRYPOINT ["/app/entrypoint.sh"]
