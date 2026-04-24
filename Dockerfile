@@ -13,11 +13,12 @@ ENV APPLICATION_PORT=8000
 # Create and switch to non-root user for security
 RUN adduser -D appuser
 
-# Install dependencies and make entrypoint executable
-RUN apk add --no-cache postgresql-dev gcc musl-dev \
+# Install dependencies, fix line endings and make entrypoint executable
+RUN apk add --no-cache postgresql-dev gcc musl-dev dos2unix \
+    && dos2unix /app/entrypoint.sh \
     && pip install -r requirements.txt \
     && chmod +x /app/entrypoint.sh \
-    && chown -R appuser:appuser /app 
+    && chown -R appuser:appuser /app
 
 # Document the port (informational only)
 EXPOSE ${APPLICATION_PORT}
