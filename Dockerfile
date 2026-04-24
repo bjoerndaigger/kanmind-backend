@@ -4,8 +4,8 @@ FROM python:3.12-alpine
 # Set working directory
 WORKDIR /app
 
-# Copy project files into the container
-COPY . $WORKDIR
+# Copy project files into /app
+COPY . .
 
 # Default port the application listens on
 ENV APPLICATION_PORT=8000 
